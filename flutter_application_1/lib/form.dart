@@ -1,284 +1,214 @@
-import 'package:flutter_application_1/main.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/data.dart' as data;
+import 'package:flutter/services.dart';
 
-class MyFormPage extends StatefulWidget {
-  const MyFormPage({super.key});
+class BudgetForm extends StatefulWidget {
+  const BudgetForm({super.key});
 
   @override
-  State<MyFormPage> createState() => _MyFormPageState();
+  State<StatefulWidget> createState() => _BudgetFormState();
 }
 
-class _MyFormPageState extends State<MyFormPage> {
-  final _formKey = GlobalKey<FormState>();
-  String _namaLengkap = "";
-  bool jenjangSarjana = false;
-  bool jenjangDiploma = false;
-  bool jenjangMagister = false;
-  bool jenjangDoktor = false;
-  double umur = 0;
-  String kelasPBP = 'A';
-  List<String> listKelasPBP = ['A', 'B', 'C', 'D', 'E', 'F', 'KI'];
-  bool _nilaiSwitch = false;
 
-  String getJenjang() {
-    String jenjang = jenjangDiploma
-        ? 'Diploma'
-        : jenjangSarjana == true
-            ? 'Sarjana'
-            : jenjangMagister
-                ? 'Magister'
-                : jenjangDoktor
-                    ? 'Doktor'
-                    : 'Tidak terdefinisi';
-    return jenjang;
-  }
+class _BudgetFormState extends State<BudgetForm> {
+  final _formKey = GlobalKey<FormState>();
+  final List<String> _listType = ["Pemasukan", "Pengeluaran"];
+  String? _title;
+  int? _nominal;
+  String? _type;
+  DateTime _dateTime = DateTime.now();
+  final _titleController = TextEditingController();
+  final _nominalController = TextEditingController();
+  final _dateController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Form'),
+        title: const Text('Form Budget'),
       ),
-
-      // Menambahkan drawer menu
-      drawer: Drawer(
-        child: Column(
-          children: [
-            // Menambahkan clickable menu
-            ListTile(
-              title: const Text('Counter'),
-              onTap: () {
-                // Route menu ke halaman utama
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyHomePage()),
-                );
-              },
-            ),
-            ListTile(
-              title: const Text('Form'),
-              onTap: () {
-                // Route menu ke halaman form
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const MyFormPage()),
-                );
-              },
-            ),
-          ],
-        ),
-      ),
-
       body: Form(
         key: _formKey,
         child: SingleChildScrollView(
           child: Container(
-            padding: const EdgeInsets.all(20.0),
+            padding: const EdgeInsets.all(20),
             child: Column(
               children: [
+                // Title
                 Padding(
-                  // Menggunakan padding sebesar 8 pixels
+                  // Using padding of 8 pixels
                   padding: const EdgeInsets.all(8.0),
                   child: TextFormField(
+                    controller: _titleController,
                     decoration: InputDecoration(
-                      hintText: "Contoh: Pak Dengklek",
-                      labelText: "Nama Lengkap",
-                      // Menambahkan icon agar lebih intuitif
-                      icon: const Icon(Icons.people),
-                      // Menambahkan circular border agar lebih rapi
+                      hintText: "Beli baso",
+                      labelText: "Judul",
+                      // Added a circular border to make it neater
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(5.0),
                       ),
                     ),
-                    // Menambahkan behavior saat nama diketik
+                    // Added behavior when name is typed
                     onChanged: (String? value) {
                       setState(() {
-                        _namaLengkap = value!;
+                        _title = value!;
                       });
                     },
-                    // Menambahkan behavior saat data disimpan
+                    // Added behavior when data is saved
                     onSaved: (String? value) {
                       setState(() {
-                        _namaLengkap = value!;
+                        _title = value!;
                       });
                     },
-                    // Validator sebagai validasi form
+                    // Validator as form validation
                     validator: (String? value) {
                       if (value == null || value.isEmpty) {
-                        return 'Nama lengkap tidak boleh kosong!';
+                        return 'Mohon isi judul!';
                       }
                       return null;
                     },
                   ),
                 ),
-                Container(
-                  margin: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const ListTile(
-                        leading: Icon(Icons.school),
-                        title: Text("Jenjang"),
+
+                // Nominal
+                Padding(
+                  // Using padding of 8 pixels
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    controller: _nominalController,
+                    keyboardType: TextInputType.number,
+                    inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                    decoration: InputDecoration(
+                      hintText: "111111",
+                      labelText: "Nominal",
+                      prefix: const Text("Rp"),
+                      // Added a circular border to make it neater
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
                       ),
-                      CheckboxListTile(
-                        title: const Text('Sarjana'),
-                        value: jenjangSarjana,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            jenjangSarjana = value!;
-                            if (value) {
-                              jenjangMagister =
-                                  jenjangDiploma = jenjangDoktor = false;
-                            }
-                          });
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: const Text('Diploma'),
-                        value: jenjangDiploma,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            jenjangDiploma = value!;
-                            if (value) {
-                              jenjangMagister =
-                                  jenjangSarjana = jenjangDoktor = false;
-                            }
-                          });
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: const Text('Magister'),
-                        value: jenjangMagister,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            jenjangMagister = value!;
-                            if (value) {
-                              jenjangDiploma =
-                                  jenjangSarjana = jenjangDoktor = false;
-                            }
-                          });
-                        },
-                      ),
-                      CheckboxListTile(
-                        title: const Text('Doktor'),
-                        value: jenjangDoktor,
-                        onChanged: (bool? value) {
-                          setState(() {
-                            jenjangDoktor = value!;
-                            if (value) {
-                              jenjangMagister =
-                                  jenjangSarjana = jenjangDiploma = false;
-                            }
-                          });
-                        },
-                      ),
-                    ],
+                    ),
+                    // Added behavior when name is typed
+                    onChanged: (String? value) {
+                      setState(() {
+                        _nominal = int.parse(value!);
+                      });
+                    },
+                    // Added behavior when data is saved
+                    onSaved: (String? value) {
+                      setState(() {
+                        _nominal = int.parse(value!);
+                      });
+                    },
+                    // Validator as form validation
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Mohon isi nominal!';
+                      }
+                      return null;
+                    },
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.co_present),
-                  title: Row(
-                    children: [
-                      Text('Umur: ${umur.round()}'),
-                    ],
-                  ),
-                  subtitle: Slider(
-                    value: umur,
-                    max: 100,
-                    divisions: 100,
-                    label: umur.round().toString(),
-                    onChanged: (double value) {
-                      setState(() {
-                        umur = value;
+
+                // Date
+                Padding(
+                  // Using padding of 8 pixels
+                  padding: const EdgeInsets.all(8.0),
+                  child: TextFormField(
+                    readOnly: true,
+                    controller: _dateController,
+                    decoration: InputDecoration(
+                      icon: const Icon(Icons.calendar_today),
+                      labelText: "Date",
+                      // Added a circular border to make it neater
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5.0),
+                      ),
+                    ),
+                    onTap: () {
+                      showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(2000),
+                        lastDate: DateTime(2050),
+                      ).then((date) {
+                        setState(() {
+                          _dateTime = date!;
+                          _dateController.text = "${_dateTime.year.toString()}-${_dateTime.month.toString().padLeft(2,'0')}-${_dateTime.day.toString().padLeft(2,'0')}";
+                        });
                       });
                     },
                   ),
                 ),
-                ListTile(
-                  leading: const Icon(Icons.class_),
-                  title: const Text(
-                    'Kelas PBP',
-                  ),
-                  trailing: DropdownButton(
-                    value: kelasPBP,
-                    icon: const Icon(Icons.keyboard_arrow_down),
-                    items: listKelasPBP.map((String items) {
-                      return DropdownMenuItem(
-                        value: items,
-                        child: Text(items),
+
+                // Dropdown
+                Padding(
+                  // Using padding of 8 pixels
+                  padding: const EdgeInsets.all(8.0),
+                  child: DropdownButtonFormField<String>(
+                    value: _type,
+                    elevation: 16,
+                    hint: const Text("Pilih Jenis"),
+                    onChanged: (String? value){
+                      setState(() {
+                        _type = value!;
+                      });
+                    },
+                    items: _listType.map<DropdownMenuItem<String>>((String value) {
+                      return DropdownMenuItem<String>(
+                        value: value,
+                        child: Text(value),
                       );
                     }).toList(),
-                    onChanged: (String? newValue) {
-                      setState(() {
-                        kelasPBP = newValue!;
-                      });
+                    // Validator as form validation
+                    validator: (String? value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Mohon isi jenis budget!';
+                      }
+                      return null;
                     },
                   ),
                 ),
-                SwitchListTile(
-                  title: const Text('Practice Mode'),
-                  value: _nilaiSwitch,
-                  onChanged: (bool value) {
-                    setState(() {
-                      _nilaiSwitch = value;
-                    });
-                  },
-                  secondary: const Icon(Icons.run_circle_outlined),
-                ),
-                TextButton(
-                    child: const Text(
-                      "Simpan",
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all(Colors.blue),
-                    ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        showDialog(
-                          context: context,
-                          builder: (context) {
-                            return Dialog(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                              elevation: 15,
-                              child: Container(
-                                child: ListView(
-                                  padding: const EdgeInsets.only(
-                                      top: 20, bottom: 20),
-                                  shrinkWrap: true,
-                                  children: <Widget>[
-                                    Center(child: const Text('Informasi Data')),
-                                    SizedBox(height: 20),
-                                    // TODO: Munculkan informasi yang didapat dari form
-                                    Text('Nama: $_namaLengkap\n'
-                                        'Jenjang: ' +  getJenjang() + '\n'
-                                        'Umur: $umur\n'
-                                        'Kelas PBP: $kelasPBP\n'
-                                        'Practice mode: $_nilaiSwitch\n '),
-                                    TextButton(
-                                      onPressed: () {
-                                        Navigator.pop(context);
-                                      },
-                                      child: Text('Kembali'),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
-                        );
-                      }
-                    }),
               ],
             ),
           ),
         ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+      floatingActionButton: TextButton(
+        style: ButtonStyle(
+          backgroundColor: MaterialStateProperty.all(Colors.blue),
+        ),
+        onPressed: () {
+          if (_formKey.currentState!.validate()) {
+            data.listBudget.add(
+                data.Budget(
+                    title: _title!,
+                    nominal: _nominal!,
+                    type: _type!,
+                    date: _dateTime,
+                )
+            );
+            _titleController.clear();
+            _nominalController.clear();
+            final successBar = SnackBar(
+                content: const Text("Budget berhasil disimpan!"),
+                action: SnackBarAction(
+                  label: 'Hide',
+                  onPressed: () {
+
+                  },
+                ),
+            );
+            ScaffoldMessenger.of(context).showSnackBar(successBar);
+          }
+        },
+        child:
+          const Text(
+            "Simpan",
+            style: TextStyle(
+              color: Colors.white,
+            ),
+          ),
       ),
     );
   }
