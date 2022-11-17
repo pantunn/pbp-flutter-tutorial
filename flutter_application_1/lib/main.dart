@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/form.dart';
-
+import 'package:flutter_application_1/todo_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
                   // Route menu ke halaman utama
                   Navigator.pushReplacement(
                     context,
-                    MaterialPageRoute(builder: (context) => const MyHomePage()),
+                    MaterialPageRoute(builder: (context) => const ToDoPage()),
                   );
                 },
               ),
